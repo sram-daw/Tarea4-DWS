@@ -1,0 +1,54 @@
+﻿@model IEnumerable<RamiloAlonsoSaraTarea4.Models.Pokemon>
+
+@{
+	ViewData["Title"] = "Index";
+}
+
+<h1>Lista de Pokemons</h1>
+
+<p>
+	<a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+	<thead>
+		<tr>
+			<th>
+				@Html.DisplayNameFor(model => model.PokemonId)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.nombre)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.peso)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.altura)
+			</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<td>
+					@Html.DisplayFor(modelItem => item.PokemonId)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.nombre)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.peso)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.altura)
+				</td>
+				<td>
+
+					@Html.ActionLink("Detalles", "DetallePokemon", new {  id=item.PokemonId  }) |
+					@Html.ActionLink("Añadir al equipo", "AddToTeam", new { /* id=item.PrimaryKey */ })
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
