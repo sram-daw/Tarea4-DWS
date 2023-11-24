@@ -1,4 +1,4 @@
-﻿@model IEnumerable<RamiloAlonsoSaraTarea4.Models.Pokemon>
+﻿@model RamiloAlonsoSaraTarea4.Models.PokemonViewModel
 
 @{
 	ViewData["Title"] = "Index";
@@ -6,46 +6,76 @@
 
 <h1>Lista de Pokemons</h1>
 
-<p>
+<!--<p>
 	<a asp-action="Create">Create New</a>
-</p>
+</p>-->
+@if (TempData["ErrorMessage"] != null)
+{
+	<div class="alert alert-danger mt-4">
+		@TempData["ErrorMessage"]
+	</div>
+}
+<div class="w-25">
+	<form id="filterForm" asp-action="FiltrarPokemonPorTipo">
+
+		@Html.DropDownListFor(m => m.Tipos,
+		new List<SelectListItem>
+		{
+		new SelectListItem { Value = "", Text = "Selecciona un tipo", Disabled = true }, // Valor por defecto
+		// Resto de las opciones
+		}
+		.Concat(Model.Tipos.Select(tipo => new SelectListItem
+		{
+		Value = tipo.id_tipo.ToString(),
+		Text = tipo.nombre
+		})),
+		new { @class = "form-control" })
+
+		<input class="my-3" type="submit" value="Filtrar" />
+
+	</form>
+</div>
+
+
+
 <table class="table">
 	<thead>
 		<tr>
 			<th>
-				@Html.DisplayNameFor(model => model.PokemonId)
+				@Html.Display("ID")
 			</th>
 			<th>
-				@Html.DisplayNameFor(model => model.nombre)
+				@Html.Display("Nombre")
 			</th>
 			<th>
-				@Html.DisplayNameFor(model => model.peso)
+				@Html.Display("Peso")
 			</th>
 			<th>
-				@Html.DisplayNameFor(model => model.altura)
+				@Html.Display("Altura")
 			</th>
 			<th></th>
 		</tr>
 	</thead>
 	<tbody>
-		@foreach (var item in Model)
+
+		@foreach (var pokemon in Model.Pokemons)
 		{
 			<tr>
 				<td>
-					@Html.DisplayFor(modelItem => item.PokemonId)
+					@Html.DisplayFor(modelItem => pokemon.PokemonId)
 				</td>
 				<td>
-					@Html.DisplayFor(modelItem => item.nombre)
+					@Html.DisplayFor(modelItem => pokemon.nombre)
 				</td>
 				<td>
-					@Html.DisplayFor(modelItem => item.peso)
+					@Html.DisplayFor(modelItem => pokemon.peso)
 				</td>
 				<td>
-					@Html.DisplayFor(modelItem => item.altura)
+					@Html.DisplayFor(modelItem => pokemon.altura)
 				</td>
 				<td>
 
-					@Html.ActionLink("Detalles", "DetallePokemon", new {  id=item.PokemonId  }) |
+					@Html.ActionLink("Detalles", "DetallePokemon", new {  id=pokemon.PokemonId  }) |
 					@Html.ActionLink("Añadir al equipo", "AddToTeam", new { /* id=item.PrimaryKey */ })
 				</td>
 			</tr>
