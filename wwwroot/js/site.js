@@ -36,6 +36,8 @@ $(document).ready(function () {
     setTimeout(function () {
         $("#alert-message").fadeOut("slow");
     }, 4000);
+
+
 });
 
 //

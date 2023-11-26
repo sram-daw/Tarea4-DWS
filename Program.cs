@@ -21,6 +21,17 @@ if (!app.Environment.IsDevelopment())
 	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
 }
+//establece las comas como separador decimal, de forma que en el formulario no se transformen en números enteros al esperar un punto
+app.Use(async (context, next) =>
+{
+    var currentThreadCulture = (CultureInfo)Thread.CurrentThread.CurrentCulture.Clone();
+    currentThreadCulture.NumberFormat = NumberFormatInfo.InvariantInfo;
+
+    Thread.CurrentThread.CurrentCulture = currentThreadCulture;
+    Thread.CurrentThread.CurrentUICulture = currentThreadCulture;
+
+    await next();
+});
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -31,7 +42,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "filtrar",
-    pattern: "{controller=Pokemon}/{action=GetPokemonsByTipoPesoAltura}/{idTipo}/{peso}/{altura}");
+    pattern: "{controller=Pokemon}/{action=FiltrarPokemonPorTipoPesoAltura}/{idTipo}/{peso}/{altura}");
 
 app.MapControllerRoute(
 	name: "default",
