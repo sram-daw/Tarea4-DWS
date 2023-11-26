@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Localization;
 using RamiloAlonsoSaraTarea4.Models;
 using RamiloAlonsoSaraTarea4.Models.Repository;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
 
 builder.Services.AddSingleton(new Conexion(builder.Configuration.GetConnectionString("ConexionTarea4")));
 builder.Services.AddScoped<IPokemonRepository,PokemonRepository>();
@@ -26,6 +29,9 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+app.MapControllerRoute(
+    name: "filtrar",
+    pattern: "{controller=Pokemon}/{action=GetPokemonsByTipoPesoAltura}/{idTipo}/{peso}/{altura}");
 
 app.MapControllerRoute(
 	name: "default",

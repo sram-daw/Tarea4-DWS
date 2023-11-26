@@ -8,10 +8,11 @@
         Task<IEnumerable<string>> GetMovimientos(int idPokemon);
         Task<IEnumerable<string>> GetTipos(int idPokemon);
         Task<PokemonDetalles> GetDetallesPokemon(int id);
-        Task<IEnumerable<Pokemon>> GetPokemonsByTipo(int idTipo);
+        Task<IEnumerable<Pokemon>> GetPokemonsByTipoPesoAltura(int idTipo, double peso, double altura);
         Task<IEnumerable<Tipo>> GetAllTipos();
+        
 
 
 
-	}
+    }
 }

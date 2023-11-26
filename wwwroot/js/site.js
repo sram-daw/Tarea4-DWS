@@ -1,6 +1,6 @@
 ﻿//Pokemon Index
 $(document).ready(function () {
-    $("#filterForm").submit(function () { //se ejecuta al hacer submit
+   /* $("#filterForm").submit(function () { //se ejecuta al hacer submit
 
         var selectedValue = $("#Tipos").val(); // el id "Tipos" se genera automáticamente por el helper DropDownListFor a partir de la expresión (m => m.Tipos)
         var baseAction = $(this).attr("action"); //obtiene la url actual de acción del formulario (el atributo "asp-action" del formulario)
@@ -23,5 +23,19 @@ $(document).ready(function () {
         if (valorSeleccionado) {
             document.getElementById("Tipos").value = valorSeleccionado;
         }
+    });*/
+
+    //timeout para mensaje de error
+   /* document.getElementById("peso").addEventListener("input", function (event) {
+        this.value = this.value.replace(',', '.');
     });
+
+    document.getElementById("altura").addEventListener("input", function (event) {
+        this.value = this.value.replace(',', '.');
+    });*/
+    setTimeout(function () {
+        $("#alert-message").fadeOut("slow");
+    }, 4000);
 });
+
+//

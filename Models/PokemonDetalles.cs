@@ -6,5 +6,6 @@
 		public string evolucion { get; set; }
 		public string involucion { get; set; }
 		public List<string> movimientos { get; set; }
+
 	}
 }

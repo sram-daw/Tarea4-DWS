@@ -67,13 +67,11 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
 
         public async Task<IEnumerable<string>> GetMovimientos(int idPokemon)
         {
-            var queryTiposIds = "SELECT id_tipo FROM pokemon_tipo WHERE numero_pokedex= @idPokemon";
-            var queryMovimientosIds = "SELECT id_tipo_ataque FROM tipo WHERE id_tipo IN @idsTipos";
+            var queryMovimientosIds = "SELECT id_movimiento FROM pokemon_movimiento_forma WHERE numero_pokedex = @idPokemon";
             var queryNombreMovimientos = "SELECT nombre FROM movimiento WHERE id_movimiento IN @idsMovimientos";
             using (var conexion = _conexion.ObtenerConexion())
             {
-                var idsTipos = await conexion.QueryAsync<int>(queryTiposIds, new { idPokemon });
-                var idsMovimientos = await conexion.QueryAsync<int>(queryMovimientosIds, new { idsTipos });
+                var idsMovimientos = await conexion.QueryAsync<int>(queryMovimientosIds, new { idPokemon });
                 var nombresMovimientos = await conexion.QueryAsync<string>(queryNombreMovimientos, new { idsMovimientos });
 
                 return nombresMovimientos.ToList();
@@ -108,18 +106,25 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
 
         }
 
-        public async Task<IEnumerable<Pokemon>> GetPokemonsByTipo(int idTipo)
+        public async Task<IEnumerable<Pokemon>> GetPokemonsByTipoPesoAltura(int idTipo, double peso, double altura)
         {
-            var queryIds = "SELECT numero_pokedex FROM pokemon_tipo WHERE id_tipo= @idTipo";
-            var queryPokemons = "SELECT * FROM pokemon WHERE PokemonId IN @idsPokemons";
+            var queryIdsPesoAltura = "SELECT PokemonId from pokemon WHERE peso=@peso AND altura=@altura";
+            var queryIdsPorTipo = "SELECT numero_pokedex from pokemon_tipo WHERE numero_pokedex IN @idsPesoAltura AND id_tipo = @idTipo";
+            var queryPokemons = "SELECT * FROM pokemon WHERE PokemonId IN @idsPorTipo";
 
             using (var conexion = _conexion.ObtenerConexion())
             {
-                var idsPokemons = await conexion.QueryAsync<int>(queryIds, new { idTipo });
-                if (idsPokemons.Any())
+                var idsPesoAltura = await conexion.QueryAsync<int>(queryIdsPesoAltura, new { peso, altura });
+                if (idsPesoAltura.Any())
                 {
-                    var pokemons = await conexion.QueryAsync<Pokemon>(queryPokemons, new { idsPokemons });
-                    return pokemons.ToList();
+                    var idsPorTipo = await conexion.QueryAsync<int>(queryIdsPorTipo, new { idsPesoAltura, idTipo });
+                    if (idsPorTipo.Any())
+                    {
+                        var pokemons = await conexion.QueryAsync<Pokemon>(queryPokemons, new { idsPorTipo });
+                        return pokemons.ToList();
+                    }
+                    else return null;
+                    
                 }
                 else return null;
             }
@@ -134,5 +139,5 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
 				return tipos.ToList();
 			}
 		}
-	}
+    }
 }
