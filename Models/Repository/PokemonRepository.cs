@@ -33,36 +33,67 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
             }
         }
 
-        public async Task<string> GetEvolucion(int idPokemon)
+        public async Task<IEnumerable<string>> GetEvolucion(int idPokemon)
         {
-            var queryId = "SELECT pokemon_evolucionado FROM evoluciona_de WHERE pokemon_origen= @idPokemon";
+            var queryIdEvolucion1 = "SELECT pokemon_evolucionado FROM evoluciona_de WHERE pokemon_origen= @idPokemon";
             var queryNombre = "SELECT nombre FROM pokemon WHERE PokemonId= @idEvolucion";
+            var queryIdEvolucion2 = "SELECT pokemon_evolucionado FROM evoluciona_de WHERE pokemon_origen= @idEvolucion";
+            var queryNombre2 = "SELECT nombre FROM pokemon WHERE PokemonId= @idEvolucion2";
+
+            List<string> listaEvoluciones = new List<string>();
             using (var conexion = _conexion.ObtenerConexion())
             {
-                var idEvolucion = await conexion.QuerySingleOrDefaultAsync<int>(queryId, new { idPokemon });
+                var idEvolucion = await conexion.QuerySingleOrDefaultAsync<int>(queryIdEvolucion1, new { idPokemon });
                 if (idEvolucion != 0)
                 {
                     var nombre = await conexion.QuerySingleOrDefaultAsync<string>(queryNombre, new { idEvolucion });
-                    return nombre.ToString();
+                    listaEvoluciones.Add(nombre.ToString());
+
+                    var idEvolucion2 = await conexion.QuerySingleOrDefaultAsync<int>(queryIdEvolucion2, new { idEvolucion });
+                    if (idEvolucion2 != 0)
+                    {
+                        var nombre2 = await conexion.QuerySingleOrDefaultAsync<string>(queryNombre2, new { idEvolucion2 });
+                        listaEvoluciones.Add(nombre2.ToString());
+                    }
                 }
-                else return "Sin evolución";
+                else
+                {
+                    listaEvoluciones.Add("Sin evolución");
+                }
             }
+            return listaEvoluciones;
         }
 
-        public async Task<string> GetInvolucion(int idPokemon)
+        public async Task<IEnumerable<string>> GetInvolucion(int idPokemon)
         {
-            var queryId = "SELECT pokemon_origen FROM evoluciona_de WHERE pokemon_evolucionado= @idPokemon";
-            var queryNombre = "SELECT nombre FROM pokemon WHERE PokemonId= @idInvolucion";
+            var queryIdInvolucion1 = "SELECT pokemon_origen FROM evoluciona_de WHERE pokemon_evolucionado= @idPokemon";
+            var queryNombre1 = "SELECT nombre FROM pokemon WHERE PokemonId= @idInvolucion";
+
+            var queryIdInvolucion2 = "SELECT pokemon_origen FROM evoluciona_de WHERE pokemon_evolucionado= @idInvolucion";
+            var queryNombre2 = "SELECT nombre FROM pokemon WHERE PokemonId= @idInvolucion2";
+
+            List<string> listaInvoluciones = new List<string>();
             using (var conexion = _conexion.ObtenerConexion())
             {
-                var idInvolucion = await conexion.QuerySingleOrDefaultAsync<int>(queryId, new { idPokemon });
+                var idInvolucion = await conexion.QuerySingleOrDefaultAsync<int>(queryIdInvolucion1, new { idPokemon });
                 if (idInvolucion != 0) //QuerySingleOrDefaultAsync devuelve 0 si no obtiene resultados
                 {
-                    var nombre = await conexion.QuerySingleOrDefaultAsync<string>(queryNombre, new { idInvolucion });
-                    return nombre.ToString();
+                    var nombre = await conexion.QuerySingleOrDefaultAsync<string>(queryNombre1, new { idInvolucion });
+                    listaInvoluciones.Add(nombre);
+
+                    var idInvolucion2 = await conexion.QuerySingleOrDefaultAsync<int>(queryIdInvolucion2, new { idInvolucion });
+                    if (idInvolucion2 != 0)
+                    {
+                        var nombre2 = await conexion.QuerySingleOrDefaultAsync<string>(queryNombre2, new { idInvolucion2 });
+                        listaInvoluciones.Add(nombre2);
+                    }
                 }
-                else return "Sin involución";
+                else
+                {
+                    listaInvoluciones.Add("Sin involución");
+                }
             }
+            return listaInvoluciones;
         }
 
         public async Task<IEnumerable<string>> GetMovimientos(int idPokemon)
@@ -98,9 +129,10 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
             PokemonDetalles pokemonDetalles = new PokemonDetalles();
 
             pokemonDetalles.nombre = (await GetPokemonName(id)).ToString();
-            pokemonDetalles.evolucion = (await GetEvolucion(id)).ToString();
-            pokemonDetalles.involucion = (await GetInvolucion(id)).ToString();
+            pokemonDetalles.evoluciones = (await GetEvolucion(id)).ToList();
+            pokemonDetalles.involuciones = (await GetInvolucion(id)).ToList();
             pokemonDetalles.movimientos = (await GetMovimientos(id)).ToList();
+            pokemonDetalles.img = "https://img.pokemondb.net/artwork/large/" + pokemonDetalles.nombre.ToLower() + ".jpg";
 
             return pokemonDetalles;
 
@@ -124,20 +156,20 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
                         return pokemons.ToList();
                     }
                     else return null;
-                    
+
                 }
                 else return null;
             }
         }
 
-		public async Task<IEnumerable<Tipo>> GetAllTipos()
-		{
-			var query = "SELECT id_tipo, nombre FROM tipo";
-			using (var conexion = _conexion.ObtenerConexion())
-			{
-				var tipos = await conexion.QueryAsync<Tipo>(query);
-				return tipos.ToList();
-			}
-		}
+        public async Task<IEnumerable<Tipo>> GetAllTipos()
+        {
+            var query = "SELECT id_tipo, nombre FROM tipo";
+            using (var conexion = _conexion.ObtenerConexion())
+            {
+                var tipos = await conexion.QueryAsync<Tipo>(query);
+                return tipos.ToList();
+            }
+        }
     }
 }
