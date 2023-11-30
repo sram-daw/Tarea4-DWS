@@ -15,7 +15,13 @@
 		@TempData["ErrorMessage"]
 	</div>
 }
-@Html.ActionLink("Filtrar", "Filtrar" )
+@if (TempData["SuccessMessage"] != null)
+{
+	<div id="alert-message" class="alert alert-success mt-4">
+		@TempData["SuccessMessage"]
+	</div>
+}
+<h3 class="my-3">@Html.ActionLink("Filtrar", "Filtrar" )</h3>
 
 <table class="table">
 	<thead>
@@ -54,7 +60,7 @@
 				<td>
 
 					@Html.ActionLink("Detalles", "DetallePokemon", new {  id=item.PokemonId  }) |
-					@Html.ActionLink("Añadir al equipo", "AddToTeam", new { /* id=item.PrimaryKey */ })
+					@Html.ActionLink("Añadir al equipo", "AddToEquipo", new {  idPokemon=item.PokemonId})
 				</td>
 			</tr>
 		}

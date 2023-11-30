@@ -1,0 +1,68 @@
+﻿@model IEnumerable<RamiloAlonsoSaraTarea4.Models.Pokemon>
+
+@{
+    ViewData["Title"] = "VerMiEquipo";
+}
+
+<h1>Mi Equipo</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div id="alert-message" class="alert alert-success mt-4">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.PokemonId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.nombre)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.peso)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.altura)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PokemonId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.nombre)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.peso)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.altura)
+                    </td>
+                    <td>
+
+                        @Html.ActionLink("Detalles", "Details", new { id=item.PokemonId}) 
+                        @Html.ActionLink("Borrar del equipo", "BorrarDeEquipo", new {  idPokemon=item.PokemonId  })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="text-center">
+        <h2>No hay Pokémons en tu equipo.</h2>
+        <img class="mt-5" src="@Url.Content("https://i.chzbgr.com/full/8169068800/hDCD62E61/classic-one-of-the-best-pikachu-gifs-ever-made")" alt="Imagen Pikachu" />
+    </div>
+}
