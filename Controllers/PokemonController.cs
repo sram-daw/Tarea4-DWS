@@ -67,27 +67,37 @@ namespace RamiloAlonsoSaraTarea4.Controllers
                 listaEquipo.Add(idPokemon);
                 string listaSerializada = JsonSerializer.Serialize(listaEquipo);
                 HttpContext.Session.Set("Equipo", Encoding.UTF8.GetBytes(listaSerializada));
-
+                TempData["SuccessMessage"] = "Pokémon añadido al equipo.";
+                var pokemons = await _pokemonRepository.GetAllPokemons();
+                return View("Index", pokemons);
             }
             else
             {
                 //si existe ya una lista, la deserializamos para añadir el nuevo id del pokemon añadido
                 string listaSerializada = Encoding.UTF8.GetString(equipoSession);
                 listaEquipo = JsonSerializer.Deserialize<List<int>>(listaSerializada);
-                listaEquipo.Add(idPokemon);
-                //se vuelve a serializar para guardar la lista
-                listaSerializada = JsonSerializer.Serialize(listaEquipo);
-                HttpContext.Session.Set("Equipo", Encoding.UTF8.GetBytes(listaSerializada));
+                int numPokemonEquipo = listaEquipo.Count();
+                if (numPokemonEquipo < 6)
+                {
+                    listaEquipo.Add(idPokemon);
+                    //se vuelve a serializar para guardar la lista
+                    listaSerializada = JsonSerializer.Serialize(listaEquipo);
+                    HttpContext.Session.Set("Equipo", Encoding.UTF8.GetBytes(listaSerializada));
+                    TempData["SuccessMessage"] = "Pokémon añadido al equipo.";
+                    var pokemons = await _pokemonRepository.GetAllPokemons();
+                    return View("Index", pokemons);
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "El equipo está lleno. Para añadir otro Pokémon, borra antes alguno.";
+                    var pokemons = await _pokemonRepository.GetAllPokemons();
+                    return View("Index", pokemons);
+                }
             }
-            TempData["SuccessMessage"] = "Pokémon añadido al equipo.";
-            var pokemons = await _pokemonRepository.GetAllPokemons();
-            return View("Index", pokemons);
-
         }
 
         public async Task<IActionResult> BorrarDeEquipo(int idPokemon)
         {
-
             byte[] equipoSession = HttpContext.Session.Get("Equipo");
             List<int> listaEquipo = new List<int>();
             //se deserializa la lista de la variable de sesión
@@ -125,6 +135,19 @@ namespace RamiloAlonsoSaraTarea4.Controllers
                 else return View("VerMiEquipo");
             }
 
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GenerarEquipoAleatorio()
+        {           
+            EquipoAleatorio equipoAleatorio = await _pokemonRepository.GetRandomTeam();
+            return View(equipoAleatorio);
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Combate() {
+            return View();
         }
     }
 }

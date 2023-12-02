@@ -51,7 +51,7 @@
                     </td>
                     <td>
 
-                        @Html.ActionLink("Detalles", "Details", new { id=item.PokemonId}) 
+                        @Html.ActionLink("Detalles", "DetallePokemon", new {  id=item.PokemonId  }) |
                         @Html.ActionLink("Borrar del equipo", "BorrarDeEquipo", new {  idPokemon=item.PokemonId  })
                     </td>
                 </tr>

@@ -1,0 +1,93 @@
+﻿@model RamiloAlonsoSaraTarea4.Models.EquipoAleatorio
+
+@{
+	ViewData["Title"] = "GenerarEquipoAleatorio";
+}
+
+<h1>Equipo Aleatorio</h1>
+
+<table class="table">
+	<thead>
+		<tr>
+			<th>
+				@Html.DisplayName("ID")
+			</th>
+			<th>
+				@Html.DisplayName("Nombre")
+			</th>
+			<th>
+				@Html.DisplayName("Peso")
+			</th>
+			<th>
+				@Html.DisplayName("Altura")
+			</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model.pokemons)
+		{
+			<tr>
+				<td>
+					@Html.DisplayFor(modelItem => item.PokemonId)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.nombre)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.peso)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.altura)
+				</td>
+				<td>
+					@Html.ActionLink("Detalles", "DetallePokemon", new {  id=item.PokemonId  })
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
+
+<table class="table mt-4">
+	<thead>
+		<tr>
+			<th>
+				@Html.DisplayName("Número de Pokémon")
+			</th>
+			<th>
+				@Html.DisplayName("Tipos predominantes")
+			</th>
+			<th>
+				@Html.DisplayName("Peso medio del equipo")
+			</th>
+			<th>
+				@Html.DisplayName("Altura media del equipo")
+			</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+
+		<tr>
+			<td>
+				@Html.DisplayFor(model=> model.cantidad)
+			</td>
+			<td>
+				<ul>
+					@foreach (var tipo in Model.listaTiposMasRepetidos)
+
+					{
+						<li>@tipo.Tipo : @tipo.Cantidad</li>
+					}
+				</ul>
+			</td>
+			<td>
+				@Html.DisplayFor(model=>model.pesoMedio)
+			</td>
+			<td>
+				@Html.DisplayFor(model=>model.alturaMedia)
+			</td>
+		</tr>
+
+	</tbody>
+</table>

@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using RamiloAlonsoSaraTarea4.Controllers;
+using System.ComponentModel.DataAnnotations;
 
 namespace RamiloAlonsoSaraTarea4.Models.Repository
 {
@@ -109,7 +110,7 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
 			}
 		}
 
-		public async Task<IEnumerable<string>> GetTipos(int idPokemon)
+		public async Task<IEnumerable<string>> GetTiposPorIdPokemon(int idPokemon)
 		{
 			var queryTiposIds = "SELECT id_tipo FROM pokemon_tipo WHERE numero_pokedex= @idPokemon";
 			var queryTiposNombres = "SELECT nombre FROM tipo WHERE id_tipo IN @idsTipos";
@@ -179,30 +180,96 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
 			}
 		}
 
-		public async Task<IEnumerable<Tipo>> GetAllTipos()
+		public async Task<IEnumerable<Pokemon>> GetMyTeam(List<int> listaIdsPokemons)
 		{
-			var query = "SELECT id_tipo, nombre FROM tipo";
-			using (var conexion = _conexion.ObtenerConexion())
-			{
-				var tipos = await conexion.QueryAsync<Tipo>(query);
-				return tipos.ToList();
-			}
-		}
-
-		public async Task<IEnumerable<Pokemon>> GetMyTeam(List<int> listaIdsPokemons) {
-
-			var query = "SELECT * FROM pokemon";
 			if (listaIdsPokemons.Any())
 			{
-				using (var conexion = _conexion.ObtenerConexion())
-				{
-					var pokemons = await conexion.QueryAsync<Pokemon>(query);
-					return pokemons.Where(x => listaIdsPokemons.Contains(x.PokemonId));
-				}
+				var pokemons = await GetAllPokemons();
+				return pokemons.Where(x => listaIdsPokemons.Contains(x.PokemonId));
 			}
 			else return null;
-			
+
 		}
 
+		public async Task<EquipoAleatorio> GetRandomTeam()
+		{
+			EquipoAleatorio equipoAleatorio = new EquipoAleatorio();
+			var pokemons = await GetAllPokemons();
+			List<int> randomIds = new List<int>();
+			Random random = new Random();
+			for (int i = 0; i < 6; i++)
+			{
+				randomIds.Add(random.Next(1, 152));
+			}
+			var pokemonsEquipo = pokemons.Where(x => randomIds.Contains(x.PokemonId));
+			equipoAleatorio.pokemons = pokemonsEquipo.ToList();
+			equipoAleatorio.cantidad= equipoAleatorio.pokemons.Count();
+			equipoAleatorio.alturaMedia = await GetAlturaMedia(randomIds);
+			equipoAleatorio.pesoMedio = await GetPesoMedio(randomIds);
+			equipoAleatorio.listaTiposMasRepetidos = await GetListaTiposMasRepetidos(randomIds);
+			return equipoAleatorio;
+
+		}
+
+		public async Task<double> GetAlturaMedia(List<int> listaIds)
+		{
+			var queryAlturas = "SELECT altura FROM pokemon WHERE PokemonId IN @listaIds";
+			using (var conexion = _conexion.ObtenerConexion())
+			{
+				var alturas = await conexion.QueryAsync<double>(queryAlturas, new { listaIds });
+				return alturas.Average();
+			}
+		}
+
+		public async Task<double> GetPesoMedio(List<int> listaIds)
+		{
+			var queryPesos = "SELECT peso FROM pokemon WHERE PokemonId IN @listaIds";
+			using (var conexion = _conexion.ObtenerConexion())
+			{
+				var alturas = await conexion.QueryAsync<double>(queryPesos, new { listaIds });
+				return alturas.Average();
+			}
+		}
+
+		public async Task<List<(string Tipo, int Cantidad)>> GetListaTiposMasRepetidos(List<int> listaIds)
+		{
+			List<int> listaIdsTipos = new List<int>();
+			var queryListaTiposIds = "SELECT id_tipo FROM pokemon_tipo WHERE numero_pokedex IN @listaIds";
+
+			List<(string Tipo, int Cantidad)> conteoPorTipo = new List<(string Tipo, int Cantidad)>();
+
+			using (var conexion = _conexion.ObtenerConexion())
+			{
+				//se obtienen los ids de los tipos asociados a los id de cada pokemon de la lista
+				var idsTipos = await conexion.QueryAsync<int>(queryListaTiposIds, new { listaIds });
+				listaIdsTipos = idsTipos.ToList();
+				//se crea una lista en la que cada item tiene dos ints asociados: uno será el id del tipo y otro el número de veces que aparece en la lista (cuantos pokemon de ese tipo hay)
+				List<(int IdTipo, int Cantidad)> conteoPorIdTipo = listaIdsTipos
+					.GroupBy(numero => numero) //se agrupan los resultados iguales
+					.Select(grupo => (IdTipo: grupo.Key, Cantidad: grupo.Count())) //se transforma cada grupo obtenido en el paso anterior en una tupla con dos propiedades: IdTipo y Cantidad (nº de veces que aparece ese id)
+					.OrderByDescending(resultado => resultado.Cantidad)
+					.ToList();
+
+				//se transforma la lista anterior en otra de tipo (string Tipo, int Cantidad) para asociar el nombre del tipo con la cantidad de veces que aparece
+				for (int i = 0; i < conteoPorIdTipo.Count(); i++)
+				{
+					string nombreTipo = await GetNombreTipoPorId(conteoPorIdTipo[i].IdTipo);
+					conteoPorTipo.Add((nombreTipo, conteoPorIdTipo[i].Cantidad));
+				 }
+				conteoPorTipo = conteoPorTipo.OrderByDescending(tupla => tupla.Cantidad).ToList();
+			}
+			return conteoPorTipo;
+		}
+
+		public async Task<string> GetNombreTipoPorId(int idTipo)
+		{
+			var queryNombreTipo = "SELECT nombre FROM tipo WHERE id_tipo=@idTipo";
+
+			using (var conexion = _conexion.ObtenerConexion())
+			{
+				var nombreTipo = await conexion.QuerySingleOrDefaultAsync<string>(queryNombreTipo, new { idTipo });
+				return nombreTipo.ToString() ?? string.Empty; //si el resultado es null, devuelve un string vacío.
+			}
+		}
 	}
 }

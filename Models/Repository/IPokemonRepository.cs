@@ -6,15 +6,19 @@
         Task<IEnumerable<string>> GetEvolucion(int idPokemon);
         Task<IEnumerable<string>> GetInvolucion(int idPokemon);
         Task<IEnumerable<string>> GetMovimientos(int idPokemon);
-        Task<IEnumerable<string>> GetTipos(int idPokemon);
+        Task<IEnumerable<string>> GetTiposPorIdPokemon(int idPokemon);
         Task<PokemonDetalles> GetDetallesPokemon(int id);
         Task<IEnumerable<Pokemon>> GetPokemonsByTipoPesoAltura(int idTipo, string peso, string altura);
-        Task<IEnumerable<Tipo>> GetAllTipos();
         Task<IEnumerable<Pokemon>> GetMyTeam(List<int> listaIdsPokemons);
+        Task<EquipoAleatorio> GetRandomTeam();
+        Task<double> GetAlturaMedia(List<int> listaIds);
+        Task<double> GetPesoMedio(List<int> listaIds);
+        Task<List<(string Tipo, int Cantidad)>> GetListaTiposMasRepetidos(List<int> listaIds);
 
 
 
 
 
-	}
+
+    }
 }
