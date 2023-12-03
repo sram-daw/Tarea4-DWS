@@ -14,6 +14,13 @@
         Task<double> GetAlturaMedia(List<int> listaIds);
         Task<double> GetPesoMedio(List<int> listaIds);
         Task<List<(string Tipo, int Cantidad)>> GetListaTiposMasRepetidos(List<int> listaIds);
+        public string GetImgPokemon(int idPokemon);
+        Task<int> Combatir(List<int> equipo1, List<int> equipo2);
+        Task<int> ObtenerIdTipoEnCombate(int idPokemon);
+        Task<double> GetAlturaById(int idPokemon);
+        Task<double> GetPesoById(int idPokemon);
+
+
 
 
 

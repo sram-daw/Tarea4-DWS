@@ -21,6 +21,9 @@
 			<th>
 				@Html.DisplayName("Altura")
 			</th>
+			<th>
+				@Html.DisplayName("Imagen")
+			</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -39,6 +42,9 @@
 				</td>
 				<td>
 					@Html.DisplayFor(modelItem => item.altura)
+				</td>
+				<td class="col-2">
+					<img src="@item.img" style="width: 30%;" class="ml-4" />
 				</td>
 				<td>
 					@Html.ActionLink("Detalles", "DetallePokemon", new {  id=item.PokemonId  })
@@ -73,13 +79,13 @@
 				@Html.DisplayFor(model=> model.cantidad)
 			</td>
 			<td>
-				<ul>
+				<ol>
 					@foreach (var tipo in Model.listaTiposMasRepetidos)
 
 					{
 						<li>@tipo.Tipo : @tipo.Cantidad</li>
 					}
-				</ul>
+				</ol>
 			</td>
 			<td>
 				@Html.DisplayFor(model=>model.pesoMedio)

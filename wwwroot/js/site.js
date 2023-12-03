@@ -34,7 +34,7 @@ $(document).ready(function () {
         this.value = this.value.replace(',', '.');
     });*/
     setTimeout(function () {
-        $("#alert-message, #alert-message2").fadeOut("slow");
+        $(".alert").fadeOut("slow");
     }, 3000);
 
 

@@ -8,4 +8,5 @@ public class Pokemon
     public string nombre { get; set; }
     public double peso {  get; set; }
     public double altura { get; set; }
+	public string img { get; set; }
 }

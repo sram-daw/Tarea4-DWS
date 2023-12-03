@@ -19,18 +19,20 @@
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.PokemonId)
+                    @Html.DisplayName("ID")
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.nombre)
+                    @Html.DisplayName("Nombre")
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.peso)
+                    @Html.DisplayName("Peso")
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.altura)
+                    @Html.DisplayName("Altura")
                 </th>
-                <th></th>
+                <th>
+                    @Html.DisplayName("Imagen")
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -48,6 +50,9 @@
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.altura)
+                    </td>
+                    <td class="col-2">
+                        <img src="@item.img" style="width: 30%;" class="ml-4" />
                     </td>
                     <td>
 

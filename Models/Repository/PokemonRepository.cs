@@ -20,7 +20,11 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
 			using (var conexion = _conexion.ObtenerConexion())
 			{
 				var pokemons = await conexion.QueryAsync<Pokemon>(query);
-				return pokemons.ToList();
+                foreach (var pokemon in pokemons)
+                {
+                    pokemon.img = GetImgPokemon(pokemon.PokemonId);
+                }
+                return pokemons.ToList();
 			}
 		}
 
@@ -133,7 +137,7 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
 			pokemonDetalles.evoluciones = (await GetEvolucion(id)).ToList();
 			pokemonDetalles.involuciones = (await GetInvolucion(id)).ToList();
 			pokemonDetalles.movimientos = (await GetMovimientos(id)).ToList();
-			pokemonDetalles.img = "https://img.pokemondb.net/artwork/large/" + pokemonDetalles.nombre.ToLower() + ".jpg";
+			pokemonDetalles.img = GetImgPokemon(id);
 
 			return pokemonDetalles;
 
@@ -185,7 +189,12 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
 			if (listaIdsPokemons.Any())
 			{
 				var pokemons = await GetAllPokemons();
-				return pokemons.Where(x => listaIdsPokemons.Contains(x.PokemonId));
+				var pokemonsTeam = pokemons.Where(x => listaIdsPokemons.Contains(x.PokemonId));
+                foreach (var pokemon in pokemons)
+                {
+                    pokemon.img = GetImgPokemon(pokemon.PokemonId);
+                }
+                return pokemonsTeam;
 			}
 			else return null;
 
@@ -197,16 +206,20 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
 			var pokemons = await GetAllPokemons();
 			List<int> randomIds = new List<int>();
 			Random random = new Random();
-			for (int i = 0; i < 6; i++)
+			while (randomIds.Count() < 6)
 			{
 				randomIds.Add(random.Next(1, 152));
 			}
 			var pokemonsEquipo = pokemons.Where(x => randomIds.Contains(x.PokemonId));
 			equipoAleatorio.pokemons = pokemonsEquipo.ToList();
-			equipoAleatorio.cantidad= equipoAleatorio.pokemons.Count();
+			equipoAleatorio.cantidad = equipoAleatorio.pokemons.Count();
 			equipoAleatorio.alturaMedia = await GetAlturaMedia(randomIds);
 			equipoAleatorio.pesoMedio = await GetPesoMedio(randomIds);
 			equipoAleatorio.listaTiposMasRepetidos = await GetListaTiposMasRepetidos(randomIds);
+			foreach (var pokemon in pokemons)
+			{
+				pokemon.img = GetImgPokemon(pokemon.PokemonId);
+			}
 			return equipoAleatorio;
 
 		}
@@ -229,6 +242,28 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
 				var alturas = await conexion.QueryAsync<double>(queryPesos, new { listaIds });
 				return alturas.Average();
 			}
+		}
+
+		public async Task<double> GetPesoById(int idPokemon)
+		{
+			var queryPeso = "SELECT peso FROM pokemon WHERE PokemonId= @idPokemon";
+			double pesoPokemon;
+			using (var conexion = _conexion.ObtenerConexion())
+			{
+				pesoPokemon = await conexion.QuerySingleOrDefaultAsync<double>(queryPeso, new { idPokemon });
+			}
+			return pesoPokemon;
+		}
+
+		public async Task<double> GetAlturaById(int idPokemon)
+		{
+			var queryAltura = "SELECT altura FROM pokemon WHERE PokemonId= @idPokemon";
+			double alturaPokemon;
+			using (var conexion = _conexion.ObtenerConexion())
+			{
+				alturaPokemon = await conexion.QuerySingleOrDefaultAsync<double>(queryAltura, new { idPokemon });
+			}
+			return alturaPokemon;
 		}
 
 		public async Task<List<(string Tipo, int Cantidad)>> GetListaTiposMasRepetidos(List<int> listaIds)
@@ -255,7 +290,7 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
 				{
 					string nombreTipo = await GetNombreTipoPorId(conteoPorIdTipo[i].IdTipo);
 					conteoPorTipo.Add((nombreTipo, conteoPorIdTipo[i].Cantidad));
-				 }
+				}
 				conteoPorTipo = conteoPorTipo.OrderByDescending(tupla => tupla.Cantidad).ToList();
 			}
 			return conteoPorTipo;
@@ -271,5 +306,145 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
 				return nombreTipo.ToString() ?? string.Empty; //si el resultado es null, devuelve un string vacío.
 			}
 		}
+		public string GetImgPokemon(int idPokemon)
+		{
+			return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/" + idPokemon + ".png";
+		}
+
+		public async Task<int> Combatir(List<int> idsEquipo1, List<int> idsEquipo2)
+		{
+			int contadorVictoriasEquipo1 = 0;
+			int contadorVictoriasEquipo2 = 0;
+
+			int idPokemon1;
+			int idPokemon2;
+
+			int idTipoPokemon1;
+			int idTipoPokemon2;
+
+			double pesoPokemon1;
+			double pesoPokemon2;
+
+			double alturaPokemon1;
+			double alturaPokemon2;
+
+			Random rnd = new Random();
+
+			//Si ambos equipos tienen 6 pokemon, habrá 6 enfrentamientos: los primeros pokemon de cada equipo entre sí, luego los segundos, etc. Gana el tipo con el id menor.
+			//Si el equipo propio tiene menos de 6 pokemon, el ganador se elige aleatoriamente
+
+			if (idsEquipo1.Count < 6)
+			{
+				return rnd.Next(1, 3);
+			}
+			else
+			{
+				for (int i = 0; i < idsEquipo1.Count; i++)
+				{
+					idTipoPokemon1 = await ObtenerIdTipoEnCombate(idsEquipo1[i]);
+					idTipoPokemon2 = await ObtenerIdTipoEnCombate(idsEquipo2[i]);
+
+					//se decide el ganador
+					if (idTipoPokemon1 < idTipoPokemon2)
+					{
+						contadorVictoriasEquipo1 += 1;
+					}
+					else if (idTipoPokemon2 < idTipoPokemon1)
+					{
+						contadorVictoriasEquipo2 += 1;
+
+					}
+					else if (idTipoPokemon1 == idTipoPokemon2) //en caso de empate gana el más pesado. 
+					{
+						idPokemon1 = idsEquipo1[i];
+						idPokemon2 = idsEquipo2[i];
+
+						pesoPokemon1 = await GetPesoById(idPokemon1);
+						pesoPokemon2 = await GetPesoById(idPokemon2);
+
+						if (pesoPokemon1 > pesoPokemon2)
+						{
+							contadorVictoriasEquipo1 += 1;
+						}
+						else if (pesoPokemon2 > pesoPokemon1)
+						{
+							contadorVictoriasEquipo2 += 1;
+
+						}
+						else if (pesoPokemon1 == pesoPokemon2) //Si pesan lo mismo, gana el más alto
+						{
+							alturaPokemon1 = await GetAlturaById(idPokemon1);
+							alturaPokemon2 = await GetAlturaById(idPokemon2);
+
+							if (alturaPokemon1 > alturaPokemon2)
+							{
+								contadorVictoriasEquipo1 += 1;
+							}
+							else if (alturaPokemon2 > alturaPokemon1)
+							{
+								contadorVictoriasEquipo2 += 1;
+							}
+							else //si son de la misma altura, el ganador se escoge aleatoriamente 
+							{
+								int ganador = rnd.Next(1, 3);
+								if (ganador == 1)
+								{
+									contadorVictoriasEquipo1 += 1;
+								}
+								else
+								{
+									contadorVictoriasEquipo2 += 1;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if (contadorVictoriasEquipo1 == contadorVictoriasEquipo2) //si ambos equipos han ganado las mismas veces, gana el equipo con mayor peso medio
+			{
+				double pesoMedioEquipo1 = await GetPesoMedio(idsEquipo1);
+				double pesoMedioEquipo2 = await GetPesoMedio(idsEquipo2);
+				if (pesoMedioEquipo1 > pesoMedioEquipo2)
+				{
+					return 1; //gana el equipo 1
+				}
+				else return 2; //gana el equipo2
+			}
+			else if (contadorVictoriasEquipo1 > contadorVictoriasEquipo2)
+			{
+				return 1; //gana el equipo 1
+			}
+			else return 2; //gana el equipo2
+
+		}
+
+		public async Task<int> ObtenerIdTipoEnCombate(int idPokemon)
+		{
+
+			var queryTiposIds = "SELECT id_tipo FROM pokemon_tipo WHERE numero_pokedex= @idPokemon";
+
+			List<int> idsTipos = new List<int>();
+			int idTipo;
+
+			using (var conexion = _conexion.ObtenerConexion())
+
+			{
+				var idTiposPokemon = await conexion.QueryAsync<int>(queryTiposIds, new { idPokemon });
+
+				idsTipos = idTiposPokemon.ToList();
+			}
+			//se asigna el id del tipo (Si el pokemon es de dos tipos, se tiene en cuenta el más favorable.)
+			if (idsTipos.Count() > 1)
+			{
+				idTipo = idsTipos.Min();
+			}
+			else
+			{
+				idTipo = idsTipos[0];
+			}
+			return idTipo;
+		}
 	}
 }
+

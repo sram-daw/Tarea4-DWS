@@ -1,11 +1,157 @@
-﻿
+﻿@model RamiloAlonsoSaraTarea4.Models.Combate
 @{
-    ViewData["Title"] = "Combate";
+	ViewData["Title"] = "Combate";
 }
 <h1 class="mb3">Combate</h1>
 <div class="text-center mt-5">
-    <a href="@Url.Action("NombreDeLaAccion", "Pokemon")" class="btn btn-primary btn-lg mx-2">Contra mi equipo</a>
+	<a href="@Url.Action("CombateVsMiEquipoCrear", "Pokemon")" class="btn btn-primary btn-lg mx-2">Contra mi equipo</a>
 
-    <a href="@Url.Action("OtraAccion", "Pokemon")" class="btn btn-secondary btn-lg mx-2">Entre equipos aleatorios</a>
+	<a href="@Url.Action("CombateEquiposRandomCrear", "Pokemon")" class="btn btn-secondary btn-lg mx-2">Entre equipos aleatorios</a>
 </div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+	<div class="alert alert-danger mt-4">
+		@TempData["ErrorMessage"]
+	</div>
+}
+
+@if (Model != null)
+{
+	@if (Model.equipoGanador != 0)
+	{
+		@if (Model.equipoGanador == 1)
+		{
+			<div class="alert alert-info mt-3" role="alert">
+				¡Ha ganado el equipo A!
+			</div>
+		}
+		else
+		{
+			<div class="alert alert-info mt-3" role="alert">
+				¡Ha ganado el equipo B!
+			</div>
+		}
+
+	}
+	@if (Model.isRandom == true)
+	{
+		<h2 class="mt-5">Equipo Aleatorio 1 (Equipo A)</h2>
+	}
+
+	else
+	{
+		<h2 class="mt-5">Mi equipo (Equipo A)</h2>
+	}
+	<table class="table">
+		<thead>
+			<tr>
+				<th>
+					@Html.DisplayName("ID")
+				</th>
+				<th>
+					@Html.DisplayName("Nombre")
+				</th>
+				<th>
+					@Html.DisplayName("Peso")
+				</th>
+				<th>
+					@Html.DisplayName("Altura")
+				</th>
+				<th>
+					@Html.DisplayName("Imagen")
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var item in Model.equipo1.pokemons)
+			{
+				<tr>
+					<td>
+						@Html.DisplayFor(modelItem => item.PokemonId)
+					</td>
+					<td>
+						@Html.DisplayFor(modelItem => item.nombre)
+					</td>
+					<td>
+						@Html.DisplayFor(modelItem => item.peso)
+					</td>
+					<td>
+						@Html.DisplayFor(modelItem => item.altura)
+					</td>
+					<td class="col-2">
+						<img src="@item.img" style="width: 30%;" class="ml-4" />
+					</td>
+					<td>
+						@Html.ActionLink("Detalles", "DetallePokemon", new {  id=item.PokemonId  })
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+
+	<h3 class="text-center my-4">VS</h3>
+
+	@if (Model.isRandom == true)
+	{
+		<h2>Equipo Aleatorio 2 (Equipo B)</h2>
+	}
+
+	else
+	{
+		<h2>Equipo Aleatorio (Equipo B)</h2>
+	}
+	<table class="table">
+		<thead>
+			<tr>
+				<th>
+					@Html.DisplayName("ID")
+				</th>
+				<th>
+					@Html.DisplayName("Nombre")
+				</th>
+				<th>
+					@Html.DisplayName("Peso")
+				</th>
+				<th>
+					@Html.DisplayName("Altura")
+				</th>
+				<th>
+					@Html.DisplayName("Imagen")
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var item in Model.equipo2.pokemons)
+			{
+				<tr>
+					<td>
+						@Html.DisplayFor(modelItem => item.PokemonId)
+					</td>
+					<td>
+						@Html.DisplayFor(modelItem => item.nombre)
+					</td>
+					<td>
+						@Html.DisplayFor(modelItem => item.peso)
+					</td>
+					<td>
+						@Html.DisplayFor(modelItem => item.altura)
+					</td>
+					<td class="col-2">
+						<img src="@item.img" style="width: 30%;" class="ml-4" />
+					</td>
+					<td>
+						@Html.ActionLink("Detalles", "DetallePokemon", new {  id=item.PokemonId  })
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+
+
+	<div class="text-center mt-5">
+		<a href="@Url.Action("Combatir", "Pokemon")" class="btn btn-warning btn-lg mx-2">Combatir</a>
+	</div>
+
+}
 
