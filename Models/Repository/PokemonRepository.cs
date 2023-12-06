@@ -175,6 +175,9 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
 					if (idsPorTipo.Any())
 					{
 						var pokemons = await conexion.QueryAsync<Pokemon>(queryPokemons, new { idsPorTipo });
+						foreach (var pokemon in pokemons) {
+							pokemon.img = GetImgPokemon(pokemon.PokemonId);
+						}
 						return pokemons.ToList();
 					}
 					else return null;
@@ -230,7 +233,7 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
 			using (var conexion = _conexion.ObtenerConexion())
 			{
 				var alturas = await conexion.QueryAsync<double>(queryAlturas, new { listaIds });
-				return alturas.Average();
+				return Math.Round(alturas.Average(),2);
 			}
 		}
 
@@ -240,7 +243,7 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
 			using (var conexion = _conexion.ObtenerConexion())
 			{
 				var alturas = await conexion.QueryAsync<double>(queryPesos, new { listaIds });
-				return alturas.Average();
+				return Math.Round(alturas.Average(),2);
 			}
 		}
 
