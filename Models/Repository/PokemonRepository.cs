@@ -334,9 +334,9 @@ namespace RamiloAlonsoSaraTarea4.Models.Repository
 			Random rnd = new Random();
 
 			//Si ambos equipos tienen 6 pokemon, habrá 6 enfrentamientos: los primeros pokemon de cada equipo entre sí, luego los segundos, etc. Gana el tipo con el id menor.
-			//Si el equipo propio tiene menos de 6 pokemon, el ganador se elige aleatoriamente
+			//Si algún equipo propio tiene menos de 6 pokemon, el ganador se elige aleatoriamente
 
-			if (idsEquipo1.Count < 6)
+			if (idsEquipo1.Count < 6 || idsEquipo2.Count < 6)
 			{
 				return rnd.Next(1, 3);
 			}
